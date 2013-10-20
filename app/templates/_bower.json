@@ -2,10 +2,10 @@
   "name": "<%= _.slugify(appname) %>",
   "version": "0.0.0",
   "dependencies": {<% if (compassBootstrap) { %>
-    "sass-bootstrap": "~2.3.0",<% } %><% if (includeRequireJS) { %>
-    "requirejs": "~2.1.4",<% } %>
+    "sass-bootstrap": "~2.3.2",<% } %><% if (includeRequireJS) { %>
+    "requirejs": "~2.1.9",<% } %>
     "modernizr": "~2.6.2",
-    "jquery": "~1.9.1"
+    "jquery": "~2.0.0"
   },
   "devDependencies": {}
 }
