@@ -76,7 +76,7 @@ SailsGenerator.prototype.git = function git() {
 
 SailsGenerator.prototype.bower = function bower() {
     this.copy('bowerrc', '.bowerrc');
-    this.copy('_component.json', 'component.json');
+    this.copy('_bower.json', 'bower.json');
 };
 
 SailsGenerator.prototype.jshint = function jshint() {
