@@ -4,116 +4,111 @@ var util = require('util');
 var path = require('path');
 var spawn = require('child_process').spawn;
 var yeoman = require('yeoman-generator');
+// var colors = require('colors');
 
+var SailsGenerator = module.exports = function SailsGenerator(args, options, config) {
+  yeoman.generators.Base.apply(this, arguments);
 
-var AppGenerator = module.exports = function Appgenerator(args, options, config) {
-    yeoman.generators.Base.apply(this, arguments);
+  // setup the test-framework property, Gruntfile template will need this
+  this.testFramework = options['test-framework'] || 'mocha';
 
-    // setup the test-framework property, Gruntfile template will need this
-    this.testFramework = options['test-framework'] || 'mocha';
+  // for hooks to resolve on mocha by default
+  if (!options['test-framework']) {
+      options['test-framework'] = 'mocha';
+  }
 
-    // for hooks to resolve on mocha by default
-    if (!options['test-framework']) {
-        options['test-framework'] = 'mocha';
-    }
+  // resolved to mocha by default (could be switched to jasmine for instance)
+  this.hookFor('test-framework', {
+      as: 'app'
+  });
 
-    // resolved to mocha by default (could be switched to jasmine for instance)
-    this.hookFor('test-framework', {
-        as: 'app'
-    });
+  this.indexFile = this.readFileAsString(path.join(this.sourceRoot(), 'index.html'));
+  this.mainJsFile = '';
+  this.mainCoffeeFile = 'console.log "\'Allo from CoffeeScript!"';
 
-    this.indexFile = this.readFileAsString(path.join(this.sourceRoot(), 'index.html'));
-    this.mainJsFile = '';
-    this.mainCoffeeFile = 'console.log "\'Allo from CoffeeScript!"';
+  this.on('end', function () {
+    this.installDependencies({ skipInstall: options['skip-install'] });
+  });
 
-    this.on('end', function() {
-        this.installDependencies({
-            skipInstall: options['skip-install']
-        });
-    });
-
-    this.pkg = JSON.parse(this.readFileAsString(path.join(__dirname, '../package.json')));
+  this.pkg = JSON.parse(this.readFileAsString(path.join(__dirname, '../package.json')));
 };
 
-util.inherits(AppGenerator, yeoman.generators.NamedBase);
+util.inherits(SailsGenerator, yeoman.generators.Base);
 
-AppGenerator.prototype.askFor = function askFor() {
-    var cb = this.async();
+SailsGenerator.prototype.askFor = function askFor() {
+  var cb = this.async();
 
-    // welcome message
-    var welcome = '\n     _-----_' + '\n    |       |' + '\n    |' + '--(o)--'.red + '|   .--------------------------.' + '\n   `---------´  |    ' + 'Welcome to Yeoman,'.yellow.bold + '    |' + '\n    ' + '( '.yellow + '_' + '´U`'.yellow + '_' + ' )'.yellow + '   |   ' + 'ladies and gentlemen!'.yellow.bold + '  |' + '\n    /___A___\\   \'__________________________\'' + '\n     |  ~  |'.yellow + '\n   __' + '\'.___.\''.yellow + '__' + '\n ´   ' + '`  |'.red + '° ' + '´ Y'.red + ' `\n';
+  // have Yeoman greet the user.
+  console.log(this.yeoman);
 
-    console.log(welcome);
-    console.log('Out of the box I include HTML5 Boilerplate, jQuery and Modernizr.');
+  console.log('Out of the box I include HTML5 Boilerplate, jQuery and Modernizr.');
 
-    var prompts = [{
-        type: 'confirm',
-        name: 'compassBootstrap',
-        message: 'Would you like to include Twitter Bootstrap for Sass?'
-    }, {
-        type: 'confirm',
-        name: 'includeRequireJS',
-        message: 'Would you like to include RequireJS (for AMD support)?'
-    }];
+  var prompts = [{
+      name: 'compassBootstrap',
+      message: 'Would you like to include Twitter Bootstrap for Sass?'
+  }, {
+      name: 'includeRequireJS',
+      message: 'Would you like to include RequireJS (for AMD support)?'
+  }];
 
-    this.prompt(prompts, function(props) {
-        // manually deal with the response, get back and store the results.
-        // we change a bit this way of doing to automatically do this in the self.prompt() method.
-        this.compassBootstrap = props.compassBootstrap;
-        this.includeRequireJS = props.includeRequireJS;
+  this.prompt(prompts, function (props) {
+      // `props` is an object passed in containing the response values, named in
+      // accordance with the `name` property from your prompt object. So, for us:
+      this.compassBootstrap = props.compassBootstrap;
+      this.includeRequireJS = props.includeRequireJS;
 
-        cb();
-    }.bind(this));
+      cb();
+  }.bind(this));
 };
 
-AppGenerator.prototype.gruntfile = function gruntfile() {
+SailsGenerator.prototype.gruntfile = function gruntfile() {
     this.template('Gruntfile.js');
 };
 
-AppGenerator.prototype.packageJSON = function packageJSON() {
+SailsGenerator.prototype.packageJSON = function packageJSON() {
     this.template('_package.json', 'package.json');
 };
 
-AppGenerator.prototype.git = function git() {
+SailsGenerator.prototype.git = function git() {
     this.copy('gitignore', '.gitignore');
     this.copy('gitattributes', '.gitattributes');
 };
 
-AppGenerator.prototype.bower = function bower() {
+SailsGenerator.prototype.bower = function bower() {
     this.copy('bowerrc', '.bowerrc');
-    this.copy('_component.json', 'component.json');
+    this.copy('_bower.json', 'bower.json');
 };
 
-AppGenerator.prototype.jshint = function jshint() {
+SailsGenerator.prototype.jshint = function jshint() {
     this.copy('jshintrc', '.jshintrc');
 };
 
-AppGenerator.prototype.editorConfig = function editorConfig() {
+SailsGenerator.prototype.editorConfig = function editorConfig() {
     this.copy('editorconfig', '.editorconfig');
 };
 
-AppGenerator.prototype.h5bp = function h5bp() {
+SailsGenerator.prototype.h5bp = function h5bp() {
     this.copy('favicon.ico', 'app/favicon.ico');
     this.copy('404.html', 'app/404.html');
     this.copy('robots.txt', 'app/robots.txt');
     this.copy('htaccess', 'app/.htaccess');
 };
 
-AppGenerator.prototype.bootstrapImg = function bootstrapImg() {
+SailsGenerator.prototype.bootstrapImg = function bootstrapImg() {
     if (this.compassBootstrap) {
         this.copy('glyphicons-halflings.png', 'app/images/glyphicons-halflings.png');
         this.copy('glyphicons-halflings-white.png', 'app/images/glyphicons-halflings-white.png');
     }
 };
 
-AppGenerator.prototype.bootstrapJs = function bootstrapJs() {
+SailsGenerator.prototype.bootstrapJs = function bootstrapJs() {
     // TODO: create a Bower component for this
     if (this.includeRequireJS) {
         this.copy('bootstrap.js', 'app/scripts/vendor/bootstrap.js');
     }
 };
 
-AppGenerator.prototype.mainStylesheet = function mainStylesheet() {
+SailsGenerator.prototype.mainStylesheet = function mainStylesheet() {
     if (this.compassBootstrap) {
         this.write('app/styles/main.scss', '$iconSpritePath: "../images/glyphicons-halflings.png";\n$iconWhiteSpritePath: "../images/glyphicons-halflings-white.png";\n\n@import \'sass-bootstrap/lib/bootstrap\';\n\n.hero-unit {\n    margin: 50px auto 0 auto;\n    width: 300px;\n}');
     } else {
@@ -121,7 +116,7 @@ AppGenerator.prototype.mainStylesheet = function mainStylesheet() {
     }
 };
 
-AppGenerator.prototype.writeIndex = function writeIndex() {
+SailsGenerator.prototype.writeIndex = function writeIndex() {
     // prepare default content text
     var defaults = ['HTML5 Boilerplate', 'Twitter Bootstrap'];
     var contentText = ['        <div class="container">', '            <div class="hero-unit">', '                <h1>\'Allo, \'Allo!</h1>', '                <p>You now have</p>', '                <ul>'];
@@ -161,7 +156,7 @@ AppGenerator.prototype.writeIndex = function writeIndex() {
 };
 
 // TODO(mklabs): to be put in a subgenerator like rjs:app
-AppGenerator.prototype.requirejs = function requirejs() {
+SailsGenerator.prototype.requirejs = function requirejs() {
     if (this.includeRequireJS) {
         this.indexFile = this.appendScripts(this.indexFile, 'scripts/main.js', ['components/requirejs/require.js'], {
             'data-main': 'scripts/main'
@@ -174,7 +169,7 @@ AppGenerator.prototype.requirejs = function requirejs() {
     }
 };
 
-AppGenerator.prototype.app = function app() {
+SailsGenerator.prototype.app = function app() {
     this.mkdir('app');
     this.mkdir('app/scripts');
     this.mkdir('app/styles');

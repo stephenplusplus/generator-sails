@@ -1,6 +1,6 @@
 {
   "name": "generator-sails",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A Yeoman sails generator largley copied from generator-webapp",
   "keywords": [
     "yeoman-generator",
@@ -23,17 +23,17 @@
     "test": "mocha --reporter spec"
   },
   "dependencies": {
-    "yeoman-generator": "~0.10.4",
-    "cheerio": "~0.10.8"
+    "yeoman-generator": "~0.13.4",
+    "cheerio": "~0.12.3"
   },
   "peerDependencies": {
     "generator-mocha": "~0.1.1"
   },
   "devDependencies": {
-    "mocha": "~1.9.0"
+    "mocha": "~1.13.0"
   },
   "engines": {
-    "node": ">=0.8.0"
+    "node": ">=0.10.0"
   },
   "licenses": [
     {
